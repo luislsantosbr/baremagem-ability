@@ -796,7 +796,7 @@ function setToday() {
 // ── GOOGLE SHEETS URL ────────────────────────────────────────
 // IMPORTANTE: Substitua a URL abaixo pela URL do seu Apps Script
 // (você recebe essa URL ao fazer o Deploy — veja o guia no HTML)
-const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxtLPle56leX08xn8BIXve2fscbwM5EtYfljtCdqk81lCpx82QbHyiGIfr0Rj8-dzaMA/exec";
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbwj2xl1cH74-j7kHkW7YqmIiOk4dm80eyTkgSLDNIIS32Ti8d14ziy2u-vsBQ-Mx6bcAg/exec";
 
 // ── COLLECT FORM DATA ────────────────────────────────────────
 function collectFormData() {
@@ -833,14 +833,19 @@ async function handleSubmit(e) {
   const data = collectFormData();
 
   try {
-    const res = await fetch(SHEETS_URL, {
-      method: "POST",
-      mode:  "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+    // Monta URL com parâmetros (GET — funciona sem CORS)
+    const params = new URLSearchParams();
+    Object.keys(data).forEach(k => {
+      if (data[k] !== null && data[k] !== undefined) {
+        params.append(k, data[k]);
+      }
     });
+    const url = SHEETS_URL + "?" + params.toString();
 
-    // no-cors retorna opaque — assume sucesso se não lançou erro
+    // Envia via fetch GET
+    await fetch(url, { method: "GET", mode: "no-cors" });
+
+    // Assume sucesso (no-cors não retorna resposta legível)
     showToast("✅ Baremagem registrada na planilha!", "ok");
     setTimeout(() => {
       if (confirm("Deseja limpar o formulário para novo preenchimento?")) {
