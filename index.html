@@ -488,8 +488,8 @@
     </div>
   </div>
 
-  
-  </div>
+  <div class="form-body">
+    <form id="mainForm">
 
     <!-- ══ SEÇÃO 1 — INFORMAÇÕES GERAIS ══ -->
     <div class="section">
@@ -692,7 +692,8 @@
       </div>
     </div>
 
-  </form>
+    </form>
+  </div>
 </div>
 
 <!-- TOAST -->
@@ -835,19 +836,17 @@ async function handleSubmit(e) {
   const data = collectFormData();
 
   try {
-    // Monta URL com parâmetros (GET — funciona sem CORS)
-    const params = new URLSearchParams();
-    Object.keys(data).forEach(k => {
-      if (data[k] !== null && data[k] !== undefined) {
-        params.append(k, data[k]);
-      }
+    // Envia via POST com JSON em text/plain para evitar bloqueio de CORS/preflight
+    await fetch(SHEETS_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify(data)
     });
-    const url = SHEETS_URL + "?" + params.toString();
 
-    // Envia via fetch GET
-    await fetch(url, { method: "GET", mode: "no-cors" });
-
-    // Assume sucesso (no-cors não retorna resposta legível)
+    // Em modo no-cors o navegador não permite ler a resposta, então assumimos sucesso após o envio
     showToast("✅ Baremagem registrada na planilha!", "ok");
     setTimeout(() => {
       if (confirm("Deseja limpar o formulário para novo preenchimento?")) {
@@ -884,6 +883,10 @@ function showToast(msg, type) {
 // ── INIT ─────────────────────────────────────────────────────
 buildEtapas();
 setToday();
+
+document
+  .getElementById("mainForm")
+  .addEventListener("submit", handleSubmit);
 </script>
 </body>
 </html>
