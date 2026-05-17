@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baremagem — Fiscal de Campo</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:    #0D1B2E;
+    --navy2:   #152032;
+    --steel:   #1E3050;
+    --red:     #CC1A2E;
+    --red-d:   #9B1020;
+    --gold:    #E8A020;
+    --teal:    #0B7A8A;
+    --white:   #FFFFFF;
+    --off:     #F3F6FA;
+    --lgray:   #DDE5EE;
+    --mgray:   #6E82A0;
+    --dktext:  #0F1C2E;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--off);
+    font-family: 'Barlow', sans-serif;
+    color: var(--dktext);
+    min-height: 100vh;
+  }
+
+  /* ── PAGE WRAPPER ── */
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--navy);
+    border-radius: 12px 12px 0 0;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .header-top {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+  }
+  .header-accent {
+    width: 8px;
+    background: var(--red);
+    flex-shrink: 0;
+  }
+  .header-content {
+    padding: 20px 24px 18px;
+    flex: 1;
+  }
+  .header-badge {
+    display: inline-block;
+    background: var(--red);
+    color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--white);
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+  }
+  .header h1 span { color: var(--gold); }
+  .header p {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--mgray);
+    font-style: italic;
+  }
+  .header-logo {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--red);
+    min-width: 100px;
+  }
+  .header-logo span {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--white);
+    letter-spacing: 1px;
+  }
+
+  /* ── FORM BODY ── */
+  .form-body {
+    background: var(--white);
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 8px 32px rgba(13,27,46,.10);
+    overflow: hidden;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    border-bottom: 1px solid var(--lgray);
+  }
+  .section:last-of-type { border-bottom: none; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--navy2);
+    padding: 12px 24px;
+  }
+  .section-num {
+    width: 26px; height: 26px;
+    background: var(--red);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .section-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--lgray);
+  }
+  .section-grid.col3 { grid-template-columns: 1fr 1fr 1fr; }
+  .section-grid.col1 { grid-template-columns: 1fr; }
+
+  .field {
+    background: var(--white);
+    padding: 14px 20px;
+  }
+  .field.full {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--mgray);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  label .req { color: var(--red); margin-left: 2px; }
+
+  input[type="text"],
+  input[type="date"],
+  input[type="time"],
+  input[type="number"],
+  select,
+  textarea {
+    width: 100%;
+    border: 1.5px solid var(--lgray);
+    border-radius: 6px;
+    padding: 9px 12px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    color: var(--dktext);
+    background: var(--off);
+    transition: border-color .18s, box-shadow .18s, background .18s;
+    outline: none;
+    appearance: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--teal);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(11,122,138,.12);
+  }
+  select { cursor: pointer; }
+  textarea { resize: vertical; min-height: 80px; }
+
+  /* ── TIME FIELDS ── */
+  .time-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    align-items: end;
+  }
+  .time-row .time-sub-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--mgray);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    display: block;
+  }
+
+  /* ── ETAPAS TABLE ── */
+  .etapas-section { background: var(--white); }
+
+  .etapas-table-header {
+    display: grid;
+    grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 2fr;
+    gap: 1px;
+    background: var(--lgray);
+    border-bottom: 1px solid var(--lgray);
+  }
+  .eth-cell {
+    background: var(--steel);
+    padding: 9px 14px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .etapa-row {
+    display: grid;
+    grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 2fr;
+    gap: 1px;
+    background: var(--lgray);
+    border-bottom: 1px solid var(--lgray);
+    transition: background .15s;
+  }
+  .etapa-row:nth-child(even) .etapa-cell { background: #F9FBFD; }
+  .etapa-row:hover .etapa-cell { background: #EDF3FB; }
+
+  .etapa-cell {
+    background: var(--white);
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+  }
+  .etapa-name {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--dktext);
+    line-height: 1.3;
+  }
+  .etapa-optional {
+    font-size: 10px;
+    color: var(--mgray);
+    font-style: italic;
+    margin-top: 1px;
+  }
+  .etapa-cell input[type="time"] {
+    padding: 5px 8px;
+    font-size: 13px;
+    background: var(--off);
+  }
+  .etapa-cell input[type="text"] {
+    padding: 5px 8px;
+    font-size: 12.5px;
+    background: var(--off);
+  }
+  .etapa-cell .tempo-display {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--teal);
+    min-width: 54px;
+    text-align: center;
+  }
+  .etapa-cell .tempo-display.zero { color: var(--lgray); }
+
+  /* ── TOTAL ROW ── */
+  .total-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--navy);
+    padding: 16px 24px;
+  }
+  .total-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .total-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--gold);
+    letter-spacing: 1px;
+  }
+
+  /* ── RADIO / CHECKBOX ── */
+  .radio-group, .check-group {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .radio-label, .check-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--dktext);
+    font-weight: 500;
+  }
+  .radio-label input, .check-label input {
+    width: auto;
+    accent-color: var(--red);
+    cursor: pointer;
+  }
+
+  /* ── STATUS PILL ── */
+  .status-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .status-option {
+    position: relative;
+  }
+  .status-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+  }
+  .status-option label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border: 2px solid var(--lgray);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mgray);
+    text-transform: none;
+    letter-spacing: 0.2px;
+    transition: all .18s;
+    background: var(--off);
+  }
+  .status-option input[type="radio"]:checked + label {
+    border-color: var(--teal);
+    background: #E8F6F8;
+    color: var(--teal);
+  }
+  .status-option.red input[type="radio"]:checked + label {
+    border-color: var(--red);
+    background: #FDE8EA;
+    color: var(--red);
+  }
+  .status-option.gold input[type="radio"]:checked + label {
+    border-color: var(--gold);
+    background: #FEF4E0;
+    color: #9B6500;
+  }
+
+  /* ── SUBMIT ── */
+  .form-footer {
+    padding: 24px;
+    background: var(--off);
+    border-top: 1px solid var(--lgray);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .form-footer .note {
+    font-size: 12px;
+    color: var(--mgray);
+    font-style: italic;
+  }
+  .btn-submit {
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    padding: 13px 36px;
+    border-radius: 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .18s, transform .12s, box-shadow .18s;
+    box-shadow: 0 4px 16px rgba(204,26,46,.25);
+  }
+  .btn-submit:hover {
+    background: var(--red-d);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(204,26,46,.35);
+  }
+  .btn-submit:active { transform: translateY(0); }
+
+  /* ── PRINT BUTTON ── */
+  .btn-print {
+    background: transparent;
+    color: var(--mgray);
+    border: 1.5px solid var(--lgray);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .18s;
+  }
+  .btn-print:hover { border-color: var(--teal); color: var(--teal); }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--lgray);
+    margin: 0 24px;
+  }
+
+  /* ── SUCCESS TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: var(--navy);
+    color: var(--white);
+    padding: 14px 24px;
+    border-radius: 10px;
+    border-left: 4px solid var(--gold);
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 8px 32px rgba(0,0,0,.3);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all .3s ease;
+    z-index: 999;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 600px) {
+    .section-grid, .section-grid.col3 { grid-template-columns: 1fr; }
+    .etapas-table-header, .etapa-row { grid-template-columns: 1fr; }
+    .eth-cell:not(:first-child) { display: none; }
+    .header h1 { font-size: 24px; }
+    .header-logo { display: none; }
+    .time-row { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media print {
+    body { background: white; }
+    .btn-submit, .btn-print, .form-footer { display: none; }
+    .header { border-radius: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div class="header-accent"></div>
+      <div class="header-content">
+        <span class="header-badge">Ability · Controle de Campo</span>
+        <h1>BAREMAGEM<br><span>Fiscal de Campo</span></h1>
+        <p>Preenchimento obrigatório após cada OS vistoriada</p>
+      </div>
+      <div class="header-logo"><span>Ability</span></div>
+    </div>
+  </div>
+
+  
+  </div>
+
+    <!-- ══ SEÇÃO 1 — INFORMAÇÕES GERAIS ══ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <span class="section-title">Informações Gerais</span>
+      </div>
+      <div class="section-grid">
+        <div class="field">
+          <label>Data <span class="req">*</span></label>
+          <input type="date" name="data" id="data" required>
+        </div>
+        <div class="field">
+          <label>Ordem de Serviço <span class="req">*</span></label>
+          <input type="text" name="os" placeholder="Ex.: 7529750453" required>
+        </div>
+        <div class="field full">
+          <label>Técnico — Nome Completo <span class="req">*</span></label>
+          <input type="text" name="tecnico" placeholder="Nome completo do técnico" required>
+        </div>
+        <div class="field">
+          <label>RE do Técnico</label>
+          <input type="text" name="re_tecnico" placeholder="Ex.: 81030340">
+        </div>
+        <div class="field">
+          <label>Fiscal Responsável <span class="req">*</span></label>
+          <input type="text" name="fiscal" placeholder="Nome do fiscal" required>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SEÇÃO 2 — TIPO DE SERVIÇO ══ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <span class="section-title">Tipo de Serviço</span>
+      </div>
+      <div class="section-grid col3">
+        <div class="field">
+          <label>Tipo de Serviço <span class="req">*</span></label>
+          <select name="tipo_servico" required>
+            <option value="">Selecione...</option>
+            <option>Instalação</option>
+            <option>Reparo</option>
+            <option>Manutenção</option>
+            <option>Visita Técnica</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>FTTH / FTTA</label>
+          <select name="ftth_ftta">
+            <option value="">Selecione...</option>
+            <option>FTTH</option>
+            <option>FTTA</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Status da Ordem <span class="req">*</span></label>
+          <select name="status_ordem" required>
+            <option value="">Selecione...</option>
+            <option>Concluída</option>
+            <option>Pendente</option>
+            <option>Cancelada</option>
+            <option>Reagendada</option>
+          </select>
+        </div>
+      </div>
+      <div class="section-grid col3">
+        <div class="field">
+          <label>REAP DROP</label>
+          <div class="radio-group" style="margin-top:4px">
+            <label class="radio-label"><input type="radio" name="reap_drop" value="SIM"> Sim</label>
+            <label class="radio-label"><input type="radio" name="reap_drop" value="NÃO" checked> Não</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Metragem (mts)</label>
+          <input type="number" name="metragem" placeholder="Ex.: 75" min="0">
+        </div>
+        <div class="field">
+          <label>Lances de Postes</label>
+          <input type="number" name="lances_postes" placeholder="Qtd." min="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SEÇÃO 3 — AVALIAÇÃO DAS ETAPAS ══ -->
+    <div class="section etapas-section">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <span class="section-title">Avaliação das Etapas</span>
+      </div>
+
+      <div style="padding: 0 0 0 0;">
+        <div class="etapas-table-header">
+          <div class="eth-cell">Descrição da Etapa</div>
+          <div class="eth-cell">Início</div>
+          <div class="eth-cell">Término</div>
+          <div class="eth-cell">Tempo</div>
+          <div class="eth-cell">Observações</div>
+        </div>
+
+        <!-- Rows -->
+        <div id="etapas-body">
+          <!-- gerado via JS -->
+        </div>
+      </div>
+
+      <!-- TOTAL -->
+      <div class="total-row">
+        <span class="total-label">⏱ Tempo Total Medido pelo Fiscal</span>
+        <span class="total-value" id="total-display">00:00</span>
+      </div>
+    </div>
+
+    <!-- ══ SEÇÃO 4 — DIAGNÓSTICO / IMPACTO ══ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <span class="section-title">Diagnóstico de Impacto na Produtividade</span>
+      </div>
+      <div class="section-grid col1">
+        <div class="field">
+          <label>Houve impacto negativo na produtividade?</label>
+          <div class="status-options" style="margin-top:6px">
+            <div class="status-option">
+              <input type="radio" name="impacto" id="imp_nao" value="Não">
+              <label for="imp_nao">✅ Não — Serviço em tempo hábil</label>
+            </div>
+            <div class="status-option red">
+              <input type="radio" name="impacto" id="imp_sim" value="Sim">
+              <label for="imp_sim">⚠️ Sim — Houve impacto</label>
+            </div>
+            <div class="status-option gold">
+              <input type="radio" name="impacto" id="imp_parc" value="Parcial">
+              <label for="imp_parc">🔶 Parcial</label>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Observações Gerais / Impacto na Produtividade</label>
+          <textarea name="obs_gerais" rows="4" placeholder="Descreva aqui qualquer ocorrência relevante, dificuldades encontradas, pendências ou pontos de atenção..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SEÇÃO 5 — AVALIAÇÃO DO TÉCNICO ══ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">5</div>
+        <span class="section-title">Avaliação do Fiscal sobre o Técnico</span>
+      </div>
+      <div class="section-grid col3">
+        <div class="field">
+          <label>Uso de EPI</label>
+          <select name="epi">
+            <option value="">Selecione...</option>
+            <option>Completo ✅</option>
+            <option>Parcial ⚠️</option>
+            <option>Sem EPI ❌</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Postura / Atendimento</label>
+          <select name="postura">
+            <option value="">Selecione...</option>
+            <option>Excelente</option>
+            <option>Bom</option>
+            <option>Regular</option>
+            <option>Ruim</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Qualidade Técnica</label>
+          <select name="qualidade">
+            <option value="">Selecione...</option>
+            <option>Excelente</option>
+            <option>Boa</option>
+            <option>Regular</option>
+            <option>Ruim</option>
+          </select>
+        </div>
+      </div>
+      <div class="section-grid col1">
+        <div class="field">
+          <label>Observações sobre o Técnico</label>
+          <textarea name="obs_tecnico" rows="3" placeholder="Comentários adicionais sobre a performance do técnico..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="form-footer">
+      <p class="note">* Campos obrigatórios. Preencha com atenção — este registro impacta indicadores contratuais.</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button type="button" class="btn-print" onclick="window.print()">🖨️ Imprimir</button>
+        <button type="submit" class="btn-submit">✓ Enviar Baremagem</button>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✅ Baremagem registrada com sucesso!</div>
+
+<script>
+// ── ETAPAS DATA ───────────────────────────────────────────────
+const etapas = [
+  { id: "deslocamento",     label: "Deslocamento",                     sub: "" },
+  { id: "contato_cliente",  label: "Tentativa de Contato com Cliente", sub: "se aplicável" },
+  { id: "entrevista",       label: "Entrevista com Cliente",           sub: "" },
+  { id: "diagnostico",      label: "Diagnóstico de Defeito",           sub: "Instalação / Reparo" },
+  { id: "avaliacao_rede",   label: "Avaliação da Rede / FAC / Manobra",sub: "" },
+  { id: "rede_externa",     label: "Execução — Rede Externa",          sub: "" },
+  { id: "rede_interna",     label: "Execução — Rede Interna",          sub: "" },
+  { id: "certificacao",     label: "Certificação Automática",          sub: "" },
+  { id: "suporte_linha",    label: "Suporte / Chat DANI (Linha)",      sub: "se aplicável" },
+  { id: "suporte_suporte",  label: "Suporte / Chat DANI (Suporte)",    sub: "se aplicável" },
+  { id: "entrega",          label: "Entrega do Serviço",               sub: "" },
+];
+
+// ── BUILD TABLE ROWS ──────────────────────────────────────────
+function buildEtapas() {
+  const body = document.getElementById("etapas-body");
+  etapas.forEach((e, i) => {
+    const row = document.createElement("div");
+    row.className = "etapa-row";
+    row.innerHTML = `
+      <div class="etapa-cell">
+        <div>
+          <div class="etapa-name">${e.label}</div>
+          ${e.sub ? `<div class="etapa-optional">${e.sub}</div>` : ""}
+        </div>
+      </div>
+      <div class="etapa-cell">
+        <input type="time" id="ini_${e.id}" name="ini_${e.id}"
+               oninput="calcTempo('${e.id}')">
+      </div>
+      <div class="etapa-cell">
+        <input type="time" id="fim_${e.id}" name="fim_${e.id}"
+               oninput="calcTempo('${e.id}')">
+      </div>
+      <div class="etapa-cell">
+        <span class="tempo-display zero" id="tempo_${e.id}">—</span>
+      </div>
+      <div class="etapa-cell">
+        <input type="text" name="obs_${e.id}" placeholder="Observação...">
+      </div>
+    `;
+    body.appendChild(row);
+  });
+}
+
+// ── TIME MATH ────────────────────────────────────────────────
+function timeToMins(t) {
+  if (!t) return null;
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
+}
+
+function minsToHHMM(mins) {
+  if (mins <= 0) return "00:00";
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`;
+}
+
+function calcTempo(id) {
+  const ini = document.getElementById(`ini_${id}`).value;
+  const fim = document.getElementById(`fim_${id}`).value;
+  const display = document.getElementById(`tempo_${id}`);
+  const iMins = timeToMins(ini);
+  const fMins = timeToMins(fim);
+
+  if (iMins !== null && fMins !== null && fMins > iMins) {
+    const diff = fMins - iMins;
+    display.textContent = minsToHHMM(diff);
+    display.classList.remove("zero");
+  } else {
+    display.textContent = "—";
+    display.classList.add("zero");
+  }
+  calcTotal();
+}
+
+function calcTotal() {
+  let total = 0;
+  etapas.forEach(e => {
+    const ini = document.getElementById(`ini_${e.id}`).value;
+    const fim = document.getElementById(`fim_${e.id}`).value;
+    const iM = timeToMins(ini), fM = timeToMins(fim);
+    if (iM !== null && fM !== null && fM > iM) total += fM - iM;
+  });
+  document.getElementById("total-display").textContent = minsToHHMM(total);
+}
+
+// ── SET TODAY ────────────────────────────────────────────────
+function setToday() {
+  const today = new Date().toISOString().split("T")[0];
+  document.getElementById("data").value = today;
+}
+
+// ── GOOGLE SHEETS URL ────────────────────────────────────────
+// IMPORTANTE: Substitua a URL abaixo pela URL do seu Apps Script
+// (você recebe essa URL ao fazer o Deploy — veja o guia no HTML)
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxtLPle56leX08xn8BIXve2fscbwM5EtYfljtCdqk81lCpx82QbHyiGIfr0Rj8-dzaMA/exec";
+
+// ── COLLECT FORM DATA ────────────────────────────────────────
+function collectFormData() {
+  const form = document.getElementById("mainForm");
+  const fd = new FormData(form);
+  const data = {};
+  for (const [key, value] of fd.entries()) data[key] = value;
+
+  // Captura tempos calculados das etapas
+  etapas.forEach(et => {
+    const el = document.getElementById(`tempo_${et.id}`);
+    data[`tempo_${et.id}`] = el ? el.textContent : "—";
+  });
+
+  // Tempo total
+  data.tempo_total = document.getElementById("total-display").textContent;
+  return data;
+}
+
+// ── SUBMIT ───────────────────────────────────────────────────
+async function handleSubmit(e) {
+  e.preventDefault();
+
+  // Validação básica: SHEETS_URL configurada?
+  if (!SHEETS_URL || SHEETS_URL.indexOf("script.google.com") === -1) {
+    showToast("⚙️ Configure a URL do Google Sheets primeiro!", "warn");
+    return;
+  }
+
+  const btn = document.querySelector(".btn-submit");
+  btn.textContent = "⏳ Enviando...";
+  btn.disabled = true;
+
+  const data = collectFormData();
+
+  try {
+    const res = await fetch(SHEETS_URL, {
+      method: "POST",
+      mode:  "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    // no-cors retorna opaque — assume sucesso se não lançou erro
+    showToast("✅ Baremagem registrada na planilha!", "ok");
+    setTimeout(() => {
+      if (confirm("Deseja limpar o formulário para novo preenchimento?")) {
+        document.getElementById("mainForm").reset();
+        etapas.forEach(et => {
+          const el = document.getElementById(`tempo_${et.id}`);
+          if (el) { el.textContent = "—"; el.classList.add("zero"); }
+        });
+        document.getElementById("total-display").textContent = "00:00";
+        setToday();
+      }
+    }, 1800);
+
+  } catch (err) {
+    showToast("❌ Erro ao enviar. Verifique sua conexão.", "err");
+    console.error("Erro:", err);
+  } finally {
+    btn.textContent = "✓ Enviar Baremagem";
+    btn.disabled = false;
+  }
+}
+
+// ── TOAST ────────────────────────────────────────────────────
+function showToast(msg, type) {
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.style.borderLeftColor =
+    type === "ok"   ? "#E8A020" :
+    type === "err"  ? "#CC1A2E" : "#0B7A8A";
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 4000);
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+buildEtapas();
+setToday();
+</script>
+</body>
+</html>
